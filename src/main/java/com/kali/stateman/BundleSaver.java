@@ -22,7 +22,7 @@ public class BundleSaver {
         this.state = state;
     }
 
-    public void saveAll(android.widget.TextView main_text, android.widget.EditText text_box, View... views) {
+    public void saveAll(View... views) {
         for (View view : views)
             saveView(view);
     }
