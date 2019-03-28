@@ -1,9 +1,12 @@
 package com.kali.stateman;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
+import java.io.Serializable;
 
 import static com.kali.stateman.Util.TAG;
 import static com.kali.stateman.Util.prm;
@@ -19,11 +22,9 @@ public class BundleLoader {
     /**
      * Constructs a new BundleLoader.
      *
-     * @param state the state to load the values from. Should not be null.
+     * @param state the non-null state to load the values from.
      */
-    public BundleLoader(Bundle state) {
-        if (state == null)
-            throw new IllegalArgumentException("State should not be null.");
+    public BundleLoader(@NonNull Bundle state) {
         this.state = state;
     }
 
@@ -90,17 +91,33 @@ public class BundleLoader {
     /**
      * Loads a value into a view from the bundle.
      *
-     * @param view       the view to load the value into.
-     * @param setter     the view's value setter.
-     * @param getter     the bundle's value getter.
-     * @param valueClass the class of the value.
-     * @param <T>        the type of the view.
-     * @param <S>        the type of the value.
+     * @param view   the view to load the value into.
+     * @param setter the view's value setter.
+     * @param getter the bundle's value getter.
+     * @param type   the value's type class.
+     * @param <T>    the type of the view.
+     * @param <S>    the type of the value.
      */
     private <T extends View, S> void load(T view, ViewSetter<T, S> setter,
-                                          BundleGetter<S> getter, Class<S> valueClass) {
+                                          BundleGetter<S> getter, Class<S> type) {
         String key = String.valueOf(view.getId());
-        S value = valueClass.cast(getter.getValue(state, key));
+        S value = type.cast(getter.getValue(state, key));
+        Log.i(TAG, "Loading value " + prm(value) + " into view " + prm(key) + ".");
+        setter.setValue(view, value);
+    }
+
+    /**
+     * Loads a Serializable value into a view from the bundle.
+     *
+     * @param view   the view to load the value into.
+     * @param setter the view's value setter.
+     * @param type   the value's type class.
+     * @param <T>    the type of the view.
+     * @param <S>    the type of the value.
+     */
+    private <T extends View, S extends Serializable> void loadSerializable(T view, ViewSetter<T, S> setter, Class<S> type) {
+        String key = String.valueOf(view.getId());
+        S value = type.cast(state.getSerializable(key));
         Log.i(TAG, "Loading value " + prm(value) + " into view " + prm(key) + ".");
         setter.setValue(view, value);
     }

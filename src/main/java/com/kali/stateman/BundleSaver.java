@@ -1,10 +1,12 @@
 package com.kali.stateman;
 
-import android.os.BaseBundle;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
+import java.io.Serializable;
 
 import static com.kali.stateman.Util.TAG;
 import static com.kali.stateman.Util.prm;
@@ -20,11 +22,9 @@ public class BundleSaver {
     /**
      * Constructs a new BundleSaver.
      *
-     * @param state the state to saves the values into. Should not be null.
+     * @param state the non-null state to saves the values into.
      */
-    public BundleSaver(Bundle state) {
-        if (state == null)
-            throw new IllegalArgumentException("State should not be null.");
+    public BundleSaver(@NonNull Bundle state) {
         this.state = state;
     }
 
@@ -89,19 +89,33 @@ public class BundleSaver {
     /**
      * Saves a value from a view into the bundle.
      *
-     * @param view       the view to save it's data.
-     * @param getter     the value getter from the view.
-     * @param setter     the value setter into the bundle.
-     * @param valueClass the class of the value.
-     * @param <T>        the type of the view.
-     * @param <S>        the type of the value.
+     * @param view   the view to save it's data.
+     * @param getter the value getter from the view.
+     * @param setter the value setter into the bundle.
+     * @param type   the value's type class.
+     * @param <T>    the type of the view.
+     * @param <S>    the type of the value.
+     * @return this instance after saving.
      */
-    private <T extends View, S> void save(T view, ViewGetter<T, S> getter,
-                                          BundleSetter<S> setter, Class<S> valueClass) {
-        S value = valueClass.cast(getter.getValue(view));
+    private <T extends View, S> BundleSaver save(T view, ViewGetter<T, S> getter,
+                                                 BundleSetter<S> setter, Class<S> type) {
+        S value = type.cast(getter.getValue(view));
         String key = String.valueOf(view.getId());
         Log.i(TAG, "Saving value " + prm(value) + " from view " + prm(key) + ".");
         setter.setValue(state, key, value);
+        return this;
+    }
+
+    /**
+     * Saves a Serializable value received from a view into the bundle.
+     *
+     * @param view   the view to extract the Serializable value from.
+     * @param getter the view Serializable value getter.
+     * @param type   the value's type class.
+     * @return this instance after saving.
+     */
+    public <T extends View, S extends Serializable> BundleSaver saveSerializable(T view, ViewGetter<T, S> getter, Class<S> type) {
+        return save(view, getter, Bundle::putSerializable, type);
     }
 
     /**
@@ -110,9 +124,10 @@ public class BundleSaver {
      * @param view   the view to extract the value from.
      * @param getter the view's value getter.
      * @param <T>    the type of the view.
+     * @return this instance after saving.
      */
-    public <T extends View> void saveString(T view, ViewGetter<T, String> getter) {
-        save(view, getter, BaseBundle::putString, String.class);
+    public <T extends View> BundleSaver saveString(T view, ViewGetter<T, String> getter) {
+        return save(view, getter, Bundle::putString, String.class);
     }
 
     /**
@@ -121,9 +136,10 @@ public class BundleSaver {
      * @param view   the view to extract the value from.
      * @param getter the value getter from the view.
      * @param <T>    the type of the view.
+     * @return this instance after saving.
      */
-    public <T extends View> void saveDouble(T view, ViewGetter<T, Double> getter) {
-        save(view, getter, BaseBundle::putDouble, Double.class);
+    public <T extends View> BundleSaver saveDouble(T view, ViewGetter<T, Double> getter) {
+        return save(view, getter, Bundle::putDouble, Double.class);
     }
 
     /* --- Value Getters --- */
