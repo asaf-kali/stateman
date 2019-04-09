@@ -47,6 +47,8 @@ public class BundleLoader {
     public BundleLoader loadView(View view) {
         if (view instanceof TextView)
             loadString((TextView) view, BundleLoader::textViewSetter);
+        // if (view instanceof RecyclerView)
+        //     loadString((RecyclerView) view, BundleLoader::textViewSetter);
         else throw new UnsupportedOperationException("Loading " + prm(view.getClass().getName()) +
                 " type is not implemented.");
         return this;
@@ -155,5 +157,15 @@ public class BundleLoader {
     public static void textViewSetter(TextView v, String value) {
         v.setText(value);
     }
+
+    // /**
+    //  * Sets a TextView's text value.
+    //  *
+    //  * @param v     the TextView to set it's text.
+    //  * @param value the string value to show in the TextView.
+    //  */
+    // public static void recyclerViewSetter(RecyclerView v, String value) {
+    //     v.set;
+    // }
 
 }

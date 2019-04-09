@@ -47,6 +47,8 @@ public class BundleSaver {
     public BundleSaver saveView(View view) {
         if (view instanceof TextView)
             saveString((TextView) view, BundleSaver::textViewGetter);
+        // if (view instanceof RecyclerView)
+        //     saveSerializable((RecyclerView) view, BundleSaver::recycleViewGetter, RecyclerView.Adapter.class);
         else throw new UnsupportedOperationException("Saving " + prm(view.getClass().getName()) +
                 " type is not implemented.");
         return this;
@@ -151,5 +153,13 @@ public class BundleSaver {
     public static String textViewGetter(TextView v) {
         return v.getText().toString();
     }
+
+    // /**
+    //  * @param v a TextView to get the text from.
+    //  * @return the text written inside a text view.
+    //  */
+    // public static RecyclerView.Adapter recycleViewGetter(RecyclerView v) {
+    //     return v.getAdapter().list
+    // }
 
 }
